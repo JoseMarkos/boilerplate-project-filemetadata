@@ -1,17 +1,36 @@
 var express = require('express');
 var cors = require('cors');
+var bodyParser = require('body-parser');
+const multer  = require('multer');
 require('dotenv').config()
 
 var app = express();
-
 app.use(cors());
 app.use('/public', express.static(process.cwd() + '/public'));
+app.use(bodyParser.urlencoded({ extended: false }))
 
 app.get('/', function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-
+const upload = multer({ dest: 'uploads/' });
+app.post('/api/fileanalyse', upload.single('upfile'), function (req, res, next) {
+  console.log(req.file);
+//   fieldname: 'upfile',
+//   originalname: 'Screen Shot 2022-08-04 at 06.23.12.png',
+//   encoding: '7bit',
+//   mimetype: 'image/png',
+//   destination: 'uploads/',
+//   filename: 'e601ea6010e09cbcdd063d8a99e791b6',
+//   path: 'uploads/e601ea6010e09cbcdd063d8a99e791b6',
+//   size: 22412
+// }
+  res.json({
+    name: req.file.originalname,
+    type: req.file.mimetype,
+    size: req.file.size
+  })
+})
 
 
 const port = process.env.PORT || 3000;
